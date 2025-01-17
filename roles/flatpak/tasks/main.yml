@@ -1,0 +1,33 @@
+---
+- name: Include flatpak variables
+  include_vars: packages.yml
+
+- name: Install Flatpak (Ubuntu)
+  apt:
+    name: flatpak
+    state: present
+  when: ansible_distribution == "Ubuntu"
+
+- name: Install Flatpak (Arch)
+  pacman:
+    name: flatpak
+    state: present
+  when: ansible_distribution == "Archlinux"
+
+- name: Install Flatpak (Fedora)
+  dnf:
+    name: flatpak
+    state: present
+  when: ansible_distribution == "Fedora"
+
+- name: Add Flathub repo
+  flatpak_remote:
+    name: flathub
+    state: present
+    flatpakrepo_url: https://flathub.org/repo/flathub.flatpakrepo
+
+- name: Install Flatpak packages
+  flatpak:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ flatpak_packages }}"

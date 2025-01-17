@@ -1,0 +1,8 @@
+---
+- name: Include package variables
+  include_vars: packages.yml
+
+- name: Install Ubuntu packages
+  apt:
+    name: "{{ ubuntu_packages }}"
+    state: present

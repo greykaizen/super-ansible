@@ -1,0 +1,24 @@
+---
+- name: Include AUR variables
+  include_vars: aur.yml
+
+- name: Install AUR helper
+  block:
+    - name: Clone AUR helper
+      git:
+        repo: "https://aur.archlinux.org/{{ aur_helper }}.git"
+        dest: "/tmp/{{ aur_helper }}"
+
+    - name: Build and install AUR helper
+      command:
+        cmd: makepkg -si --noconfirm
+        chdir: "/tmp/{{ aur_helper }}"
+      become: yes
+      become_user: "{{ ansible_user_id }}"
+
+- name: Install AUR packages
+  command:
+    cmd: "{{ aur_helper }} -S --noconfirm {{ item }}"
+  loop: "{{ aur_packages }}"
+  become: yes
+  become_user: "{{ ansible_user_id }}"

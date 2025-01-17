@@ -1,0 +1,6 @@
+flatpak_packages:
+  - com.spotify.Client
+  - org.mozilla.firefox
+  - com.discord.Discord
+  - org.gimp.GIMP
+  - org.videolan.VLC

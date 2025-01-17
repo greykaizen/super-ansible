@@ -1,0 +1,6 @@
+arch_packages:
+  - base-devel
+  - linux-headers
+  - nvidia
+  - pipewire
+  - pipewire-pulse

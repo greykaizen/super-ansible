@@ -1,0 +1,11 @@
+---
+- hosts: localhost
+  become: true
+  roles:
+    - flatpak
+    - role: ubuntu
+      when: ansible_distribution == "Ubuntu"
+    - role: arch
+      when: ansible_distribution == "Archlinux"
+    - role: fedora
+      when: ansible_distribution == "Fedora"

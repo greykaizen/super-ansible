@@ -1,0 +1,6 @@
+ubuntu_packages:
+  - build-essential
+  - ubuntu-restricted-extras
+  - gnome-tweaks
+  - preload
+  - tlp

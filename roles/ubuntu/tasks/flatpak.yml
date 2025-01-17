@@ -1,0 +1,20 @@
+---
+- name: Include flatpak variables
+  include_vars: flatpak.yml
+
+- name: Install Flatpak
+  apt:
+    name: flatpak
+    state: present
+
+- name: Add Flathub repo
+  flatpak_remote:
+    name: flathub
+    state: present
+    flatpakrepo_url: https://flathub.org/repo/flathub.flatpakrepo
+
+- name: Install Flatpak packages
+  flatpak:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ flatpak_packages }}"

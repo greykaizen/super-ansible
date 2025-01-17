@@ -1,0 +1,5 @@
+aur_helper: yay
+aur_packages:
+  - google-chrome
+  - visual-studio-code-bin
+  - timeshift
