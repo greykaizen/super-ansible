@@ -1,6 +1,22 @@
 flatpak_packages:
-  - com.spotify.Client
+  - com.brave.Browser
+  - app.zen_browser.zen
+  - io.github.dvlv.boxbuddyrs
+  - org.jousse.vincent.Pomodorolm
+  - org.telegram.desktop
+  - com.github.tchx84.Flatseal
+
+flatpak_packages_test:
+  - app.zen_browser.zen
   - org.mozilla.firefox
   - com.discord.Discord
   - org.gimp.GIMP
   - org.videolan.VLC
+
+common_packages:
+  - com.brave.Browser
+  - app.zen_browser.zen
+  - io.github.dvlv.boxbuddyrs
+  - org.jousse.vincent.Pomodorolm
+  - org.telegram.desktop
+  - com.github.tchx84.Flatseal
