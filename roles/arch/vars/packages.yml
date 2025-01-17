@@ -4,3 +4,4 @@ arch_packages:
   - nvidia
   - pipewire
   - pipewire-pulse
+  - tmux
