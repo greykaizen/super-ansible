@@ -1,1 +1,16 @@
-packages.yml
+---
+- name: Include package variables
+  include_vars: packages.yml
+
+- name: Update package lists
+  pacman:
+    update_cache: yes
+
+- name: Install Arch packages
+  pacman:
+    name: "{{ arch_packages }}"
+    state: present
+
+- name: Import AUR tasks if AUR helper is defined
+  import_tasks: aur.yml
+  when: aur_helper is defined
