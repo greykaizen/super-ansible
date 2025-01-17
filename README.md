@@ -35,3 +35,6 @@ To know the name of the distro ansible is using
             └── packages.yml
 '''
 
+- workables command for local testing
+> ansible-playbook local.yml
+
