@@ -47,25 +47,25 @@
         - cp /wallpaper/splash.png /usr/share/wallpapers/cachyos-wallpapers/splash.png
 
 - additional
-- file split
-- tasks
-    - systemctl
-        - docker start and it's hello-world and then docker stop
-    - rustup
-        - rustup default stable
-        - some check like cargo new project in ~/Projects and if it's successful, delete the project (opt)
-    - chezmoi (install and run)
-        - PAT require for git
-        - init --apply -v
-- OS
-    - fedora
-    - Ubuntu, popos
+    - file split
+    - tasks
+        - systemctl
+            - docker start and it's hello-world and then docker stop
+        - rustup
+            - rustup default stable
+            - some check like cargo new project in ~/Projects and if it's successful, delete the project (opt)
+        - chezmoi (install and run)
+            - PAT require for git
+            - init --apply -v
+        - shell setup
+            - clone configs-cachyos and install fish, zsh (plugins as well)
+            - default shell setup
+            - shell profile
+    - OS
+        - fedora
+        - Ubuntu, popos
         
 - todo
-    - pkg update from supreme-bot
-    - fedora/ubuntu correction
     
 - progress
-    - pkgs
-    - flatpak
-    - aur 
+    - marked as 🟢

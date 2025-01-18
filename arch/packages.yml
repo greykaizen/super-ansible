@@ -32,3 +32,4 @@ arch_packages:
   - openssh
   - rustup
   - zed
+  - xdg-desktop-portal
