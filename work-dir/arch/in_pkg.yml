@@ -1,0 +1,22 @@
+---
+- name: Install Arch Linux packages
+  hosts: localhost
+  connection: local
+  gather_facts: true
+  become: true
+
+  vars_files:
+    - packages.yml
+
+  pre_tasks:
+    - name: Check if system is Arch Linux
+      ansible.builtin.fail:
+        msg: "This playbook is only for Arch Linux systems"
+      when: ansible_distribution != "Archlinux"
+
+  tasks:
+    - name: Install packages using pacman
+      pacman:
+        name: "{{ arch_packages }}"
+        state: present
+        update_cache: true

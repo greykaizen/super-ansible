@@ -1,0 +1,208 @@
+---
+- name: Arch Linux System Setup
+  hosts: localhost
+  connection: local
+  become: true
+  gather_facts: true
+
+  vars:
+    font_urls:
+      - "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/CascadiaCode.zip"
+      - "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/FiraCode.zip"
+      - "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/JetBrainsMono.zip"
+      - "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/Meslo.zip"
+      - "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/Noto.zip"
+      - "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/RobotoMono.zip"
+      - "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/Ubuntu.zip"
+    cursor_urls:
+      - "https://github.com/ful1e5/Bibata_Cursor/releases/download/v2.0.7/Bibata-Modern-Classic.tar.xz"
+      - "https://github.com/ful1e5/Bibata_Cursor/releases/download/v2.0.7/Bibata-Modern-Ice.tar.xz"
+    fonts_dir: "/usr/local/share/fonts"
+    cursors_dir: "/usr/share/icons"
+    download_dir: "/tmp/downloads"
+
+  pre_tasks:
+    - name: Ensure system is Arch Linux
+      fail:
+        msg: "This playbook is only for Arch Linux systems"
+      when: ansible_facts['distribution'] != 'Archlinux'
+
+    - name: Update package cache
+      pacman:
+        update_cache: yes
+
+    - name: Perform full system upgrade
+      pacman:
+        upgrade: yes
+
+    - name: Create temporary download directory
+      file:
+        path: "{{ download_dir }}"
+        state: directory
+        mode: '0755'
+
+  tasks:
+    - name: Install pacman packages
+      pacman:
+        name:
+          - gcc
+          - make
+          - jq
+          - jre21-openjdk-headless
+          - libplasma
+          - kauth
+          - podman
+          - docker
+          - git
+          - zoxide
+          - fzf
+          - bat
+          - fish
+          - tmux
+          - aria2
+          - fastfetch
+          - alacritty
+          - distrobox
+          - gnome-boxes
+          - vlc
+          - libreoffice-fresh
+          - okular
+          - qalculate-qt
+          - qbittorrent
+          - kile
+          - kate
+          - kwrite
+          - gwenview
+          - kio-admin
+          - chezmoi
+          - openssh
+          - rustup
+          - zed
+          - os-prober
+          - plymouth
+          - base-devel
+        state: present
+    #
+    # - name: Install yay AUR helper
+    #   block:
+    #     - name: Clone yay repository
+    #       git:
+    #         repo: https://aur.archlinux.org/yay.git
+    #         dest: "{{ download_dir }}/yay"
+    #       become: false
+    #
+    #     - name: Build and install yay
+    #       command:
+    #         cmd: makepkg -si --noconfirm
+    #         chdir: "{{ download_dir }}/yay"
+    #       become: false
+    #   when: not ansible_check_mode
+
+    - name: Install AUR packages
+      shell: "yay -S --noconfirm {{ item }}"
+      loop:
+        - mediawriter
+        - visual-studio-code-bin
+        - thorium-browser-bin
+      become: false
+      register: aur_result
+      failed_when: aur_result.rc != 0 and not ansible_check_mode
+
+    - name: Install Flatpak
+      pacman:
+        name: flatpak
+        state: present
+
+    - name: Add Flathub repository
+      command: flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+      become: false
+      register: flatpak_repo
+      changed_when: flatpak_repo.rc == 0
+      failed_when: flatpak_repo.rc != 0 and not ansible_check_mode
+
+    - name: Install Flatpak packages
+      shell: "flatpak install -y flathub {{ item }}"
+      loop:
+        - com.brave.Browser
+        - app.zen_browser.zen
+        - io.github.dvlv.boxbuddyrs
+        - org.jousse.vincent.Pomodorolm
+        - org.telegram.desktop
+        - com.github.tchx84.Flatseal
+      become: false
+      register: flatpak_result
+      failed_when: flatpak_result.rc != 0 and not ansible_check_mode
+
+    - name: Set up font directories
+      block:
+        - name: Create main fonts directory
+          file:
+            path: "{{ fonts_dir }}"
+            state: directory
+            mode: '0755'
+
+        - name: Download Nerd Fonts
+          get_url:
+            url: "{{ item }}"
+            dest: "{{ download_dir }}/{{ item | basename }}"
+          loop: "{{ font_urls }}"
+
+        - name: Extract Nerd Fonts
+          unarchive:
+            src: "{{ download_dir }}/{{ item | basename }}"
+            dest: "{{ fonts_dir }}"
+            remote_src: yes
+          loop: "{{ font_urls }}"
+
+    - name: Set up cursor themes
+      block:
+        - name: Download Bibata cursors
+          get_url:
+            url: "{{ item }}"
+            dest: "{{ download_dir }}/{{ item | basename }}"
+          loop: "{{ cursor_urls }}"
+
+        - name: Extract Bibata cursors
+          unarchive:
+            src: "{{ download_dir }}/{{ item | basename }}"
+            dest: "{{ cursors_dir }}"
+            remote_src: yes
+          loop: "{{ cursor_urls }}"
+
+    - name: Configure GRUB
+      block:
+        - name: Run os-prober
+          command: os-prober
+          register: os_prober_result
+          changed_when: os_prober_result.rc == 0
+          failed_when: false
+
+        - name: Update GRUB configuration
+          command: grub-mkconfig -o /boot/grub/grub.cfg
+          register: grub_result
+          changed_when: grub_result.rc == 0
+
+    - name: Configure Plymouth
+      command: plymouth-set-default-theme -R spinner
+      register: plymouth_result
+      changed_when: plymouth_result.rc == 0
+
+    - name: Set up GRUB wallpaper
+      block:
+        - name: Create wallpapers directory
+          file:
+            path: /usr/share/wallpapers/cachyos-wallpapers
+            state: directory
+            mode: '0755'
+
+        - name: Copy GRUB wallpaper
+          copy:
+            src: wallpaper/splash.png
+            dest: /usr/share/wallpapers/cachyos-wallpapers/splash.png
+            mode: '0644'
+
+  post_tasks:
+    - name: Clean up temporary files
+      file:
+        path: "{{ download_dir }}"
+        state: absent

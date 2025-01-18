@@ -1,0 +1,11 @@
+arch-pkg
+    - install_pkg.yml
+    - packages.yml
+
+commands
+    - ansible-playbook in_pkg.yml -K
+    - ansible-playbook in_flatpaks.yml -K
+    - ansible-playbook in_aur_pkg.yml
+    - ansible-playbook in_font_cursor.yml -K
+    - ansible-playbook extra.yml -K
+

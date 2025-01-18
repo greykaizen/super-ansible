@@ -1,0 +1,83 @@
+why is there remote-user, it has to run locally for me only. I want to run this whenever i install a new arch linux and have my installations automated for the current user that i have. i also want to have this on github so i can pull and run directly without modifications for each user i make on new arch linux, conciseness is the key, here's what i want to acheive, write as long as you can
+
+- pre-tasks
+
+    - update repos
+
+    - update system
+
+    - 
+
+- target tasks
+
+    - pkgs
+
+        - gcc make jq jre21-openjdk-headless
+
+        libplasma kauth podman docker git zoxide fzf bat fish
+
+        tmux aria2 fastfetch alacritty distrobox gnome-boxes
+
+        vlc libreoffice-fresh okular qalculate-qt qbittorrent
+
+        kile kate kwrite gwenview
+
+        "kio-admin" chezmoi openssh rustup zed
+
+    - flatpaks
+
+        - - com.brave.Browser
+
+        - app.zen_browser.zen
+
+        - io.github.dvlv.boxbuddyrs
+
+        - org.jousse.vincent.Pomodorolm
+
+        - org.telegram.desktop
+
+        - com.github.tchx84.Flatseal
+
+    - aur helper installation
+
+        - "mediawriter"
+
+        - "visual-studio-code-bin"
+
+        - "thorium-browser-bin"
+
+    - fonts
+
+        - https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/CascadiaCode.zip
+
+        - https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/FiraCode.zip
+
+        - https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/JetBrainsMono.zip
+
+        - https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/Meslo.zip
+
+        - https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/Noto.zip
+
+        - https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/RobotoMono.zip
+
+        - https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/Ubuntu.zip
+
+    - icons
+
+        - https://github.com/ful1e5/Bibata_Cursor/releases/download/v2.0.7/Bibata-Modern-Classic.tar.xz
+
+        - https://github.com/ful1e5/Bibata_Cursor/releases/download/v2.0.7/Bibata-Modern-Ice.tar.xz
+
+    - grub
+
+        - install os-prober, run it
+
+        - sudo grub-mkconfig -o /boot/grub/grub.cfg
+
+    - plymouth
+
+        - plymouth-set-default-theme -R spinner
+
+    - grub wallpaper
+
+        - cp /wallpaper/splash.png /usr/share/wallpapers/cachyos-wallpapers/splash.png

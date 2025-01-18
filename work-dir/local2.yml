@@ -1,0 +1,173 @@
+---
+- name: Arch Linux System Setup
+  hosts: localhost
+  connection: local
+  become: true
+  gather_facts: true
+
+  vars:
+    font_urls:
+      - "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/CascadiaCode.zip"
+      - "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/FiraCode.zip"
+      - "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/JetBrainsMono.zip"
+      - "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/Meslo.zip"
+      - "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/Noto.zip"
+      - "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/RobotoMono.zip"
+      - "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/Ubuntu.zip"
+    cursor_urls:
+      - "https://github.com/ful1e5/Bibata_Cursor/releases/download/v2.0.7/Bibata-Modern-Classic.tar.xz"
+      - "https://github.com/ful1e5/Bibata_Cursor/releases/download/v2.0.7/Bibata-Modern-Ice.tar.xz"
+    fonts_dir: "/usr/local/share/fonts"
+    cursors_dir: "/usr/share/icons"
+
+  pre_tasks:
+    - name: Check if system is Arch Linux
+      ansible.builtin.set_fact:
+        is_arch: "{{ ansible_facts['distribution'] == 'Archlinux' }}"
+
+    - name: Update package cache
+      ansible.builtin.pacman:
+        update_cache: yes
+      when: is_arch
+
+    - name: Perform full system upgrade
+      ansible.builtin.pacman:
+        upgrade: yes
+      when: is_arch
+
+  tasks:
+    - name: Install pacman packages
+      ansible.builtin.pacman:
+        name:
+          - gcc
+          - make
+          - jq
+          - jre21-openjdk-headless
+          - libplasma
+          - kauth
+          - podman
+          - docker
+          - git
+          - zoxide
+          - fzf
+          - bat
+          - fish
+          - tmux
+          - aria2
+          - fastfetch
+          - alacritty
+          - distrobox
+          - gnome-boxes
+          - vlc
+          - libreoffice-fresh
+          - okular
+          - qalculate-qt
+          - qbittorrent
+          - kile
+          - kate
+          - kwrite
+          - gwenview
+          - kio-admin
+          - chezmoi
+          - openssh
+          - rustup
+          - zed
+          - os-prober
+          - plymouth
+        state: present
+      when: is_arch
+
+    # - name: Install yay AUR helper
+    #   ansible.builtin.shell: |
+    #     if ! command -v yay &> /dev/null; then
+    #       git clone https://aur.archlinux.org/yay.git
+    #       cd yay
+    #       makepkg -si --noconfirm
+    #       cd ..
+    #       rm -rf yay
+    #     fi
+    #   args:
+    #     creates: /usr/bin/yay
+    #   become: false
+    #   when: is_arch
+
+    - name: Install AUR packages
+      ansible.builtin.shell: "yay -S --noconfirm {{ item }}"
+      with_items:
+        - mediawriter
+        - visual-studio-code-bin
+        - thorium-browser-bin
+      become: false
+      when: is_arch
+
+    - name: Install Flatpak
+      ansible.builtin.pacman:
+        name: flatpak
+        state: present
+      when: is_arch
+
+    - name: Add Flathub repository
+      ansible.builtin.shell: flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+      become: false
+      when: is_arch
+
+    - name: Install Flatpak packages
+      ansible.builtin.shell: "flatpak install -y flathub {{ item }}"
+      with_items:
+        - com.brave.Browser
+        - app.zen_browser.zen
+        - io.github.dvlv.boxbuddyrs
+        - org.jousse.vincent.Pomodorolm
+        - org.telegram.desktop
+        - com.github.tchx84.Flatseal
+      become: false
+      when: is_arch
+
+    - name: Create fonts directory
+      ansible.builtin.file:
+        path: "{{ fonts_dir }}"
+        state: directory
+        mode: '0755'
+      when: is_arch
+
+    - name: Download and install Nerd Fonts
+      ansible.builtin.unarchive:
+        src: "{{ item }}"
+        dest: "{{ fonts_dir }}"
+        remote_src: yes
+      with_items: "{{ font_urls }}"
+      when: is_arch
+
+    - name: Download and install Bibata cursors
+      ansible.builtin.unarchive:
+        src: "{{ item }}"
+        dest: "{{ cursors_dir }}"
+        remote_src: yes
+      with_items: "{{ cursor_urls }}"
+      when: is_arch
+
+    - name: Run os-prober
+      ansible.builtin.command: os-prober
+      when: is_arch
+
+    - name: Update GRUB configuration
+      ansible.builtin.command: grub-mkconfig -o /boot/grub/grub.cfg
+      when: is_arch
+
+    - name: Set Plymouth theme
+      ansible.builtin.command: plymouth-set-default-theme -R spinner
+      when: is_arch
+
+    - name: Create wallpapers directory
+      ansible.builtin.file:
+        path: /usr/share/wallpapers/cachyos-wallpapers
+        state: directory
+        mode: '0755'
+      when: is_arch
+
+    - name: Copy GRUB wallpaper
+      ansible.builtin.copy:
+        src: wallpaper/splash.png
+        dest: /usr/share/wallpapers/cachyos-wallpapers/splash.png
+        mode: '0644'
+      when: is_arch

@@ -1,0 +1,116 @@
+---
+- name: Arch Linux System Configuration and Package Management
+  hosts: localhost
+  become: true
+  gather_facts: true
+
+  pre_tasks:
+    - name: Check if system is Arch Linux
+      ansible.builtin.set_fact:
+        is_arch: "{{ ansible_facts['distribution'] == 'Archlinux' }}"
+
+    - name: Update package cache
+      ansible.builtin.pacman:
+        update_cache: yes
+        upgrade: yes
+        name:
+          - base-devel
+          - git
+        state: present
+      when: is_arch
+
+    # - name: Perform full system upgrade
+    #   ansible.builtin.pacman:
+    #     upgrade: yes
+    #   when: is_arch
+
+    # - name: Install base-devel package group (required for AUR)
+    #   ansible.builtin.pacman:
+    #     name: base-devel
+    #     state: present
+    #   when: is_arch
+    #
+    # - name: Install git (required for AUR)
+    #   ansible.builtin.pacman:
+    #     name: git
+    #     state: present
+    #   when: is_arch
+    #
+    # - name: Install yay AUR helper
+    #   ansible.builtin.shell: |
+    #     if ! command -v yay &> /dev/null; then
+    #       git clone https://aur.archlinux.org/yay.git
+    #       cd yay
+    #       makepkg -si --noconfirm
+    #       cd ..
+    #       rm -rf yay
+    #     fi
+    #   args:
+    #     creates: /usr/bin/yay
+    #   when: is_arch
+
+  tasks:
+    - name: Install Pacman packages
+      ansible.builtin.pacman:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - tmux
+        # Add your pacman packages here
+        # Example:
+        # - firefox
+        # - vim
+        # - tmux
+      when: is_arch
+
+    - name: Install AUR packages
+      ansible.builtin.shell: "yay -S --noconfirm {{ item }}"
+      with_items:
+        # Add your AUR packages here
+        # Example:
+        - visual-studio-code-bin
+        # - spotify
+      when: is_arch
+
+    # - name: Enable and start system services
+    #   ansible.builtin.systemd:
+    #     name: "{{ item }}"
+    #     enabled: yes
+    #     state: started
+    #   with_items:
+    #     # Add services to enable/start
+    #     # Example:
+    #     # - docker
+    #     # - sshd
+    #   when: is_arch
+    #
+    # - name: Configure system settings
+    #   ansible.builtin.sysctl:
+    #     name: "{{ item.key }}"
+    #     value: "{{ item.value }}"
+    #     state: present
+    #   with_items:
+    #     - { key: "vm.swappiness", value: "10" }
+    #     - { key: "vm.vfs_cache_pressure", value: "50" }
+    #   when: is_arch
+    #
+    # - name: Set up system maintenance timer
+    #   ansible.builtin.systemd:
+    #     name: paccache.timer
+    #     enabled: yes
+    #     state: started
+    #   when: is_arch
+    #
+    # - name: Configure pacman parallel downloads
+    #   ansible.builtin.lineinfile:
+    #     path: /etc/pacman.conf
+    #     regexp: "^#?ParallelDownloads"
+    #     line: "ParallelDownloads = 5"
+    #   when: is_arch
+    #
+    # - name: Enable reflector service for mirror optimization
+    #   ansible.builtin.systemd:
+    #     name: reflector.timer
+    #     enabled: yes
+    #     state: started
+    #   when: is_arch

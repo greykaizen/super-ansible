@@ -1,0 +1,71 @@
+- name: Install fonts and icons
+  hosts: localhost
+  gather_facts: yes  # Changed to yes to get ansible_env.HOME
+
+  vars_files:
+    - fonts.yml
+    - icons.yml
+
+  tasks:
+    - name: Create required directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0755'
+      loop:
+        - "{{ ansible_env.HOME }}/.fonts"
+        - "{{ ansible_env.HOME }}/.icons"
+
+    - name: Download and extract fonts
+      block:
+        - name: Download font file
+          ansible.builtin.get_url:
+            url: "{{ item }}"
+            dest: "/tmp/{{ item | basename }}"
+          loop: "{{ fonts }}"
+
+        - name: Create font directory
+          ansible.builtin.file:
+            path: "{{ ansible_env.HOME }}/.fonts/{{ item | basename | regex_replace('.zip$', '') }}"
+            state: directory
+            mode: '0755'
+          loop: "{{ fonts }}"
+
+        - name: Extract font zip file
+          ansible.builtin.unarchive:
+            src: "/tmp/{{ item | basename }}"
+            dest: "{{ ansible_env.HOME }}/.fonts/{{ item | basename | regex_replace('.zip$', '') }}"
+            remote_src: yes
+            creates: "{{ ansible_env.HOME }}/.fonts/{{ item | basename | regex_replace('.zip$', '') }}"
+          loop: "{{ fonts }}"
+
+    - name: Download and extract icons
+      block:
+        - name: Download icon file
+          ansible.builtin.get_url:
+            url: "{{ item }}"
+            dest: "/tmp/{{ item | basename }}"
+          loop: "{{ icons }}"
+
+        - name: Extract icon tarball to ~/.icons
+          ansible.builtin.unarchive:
+            src: "/tmp/{{ item | basename }}"
+            dest: "{{ ansible_env.HOME }}/.icons/"
+            remote_src: yes
+            creates: "{{ ansible_env.HOME }}/.icons/{{ item | basename | regex_replace('.(tar.gz|tgz|zip)$', '') }}"
+          loop: "{{ icons }}"
+
+        - name: Extract icon tarball to /usr/share/icons
+          ansible.builtin.unarchive:
+            src: "/tmp/{{ item | basename }}"
+            dest: "/usr/share/icons/"
+            remote_src: yes
+            creates: "/usr/share/icons/{{ item | basename | regex_replace('.(tar.gz|tgz|zip)$', '') }}"
+          become: yes  # Added to get root privileges for system-wide installation
+          loop: "{{ icons }}"
+
+    - name: Cleanup temporary files
+      ansible.builtin.file:
+        path: "/tmp/{{ item | basename }}"
+        state: absent
+      loop: "{{ fonts + icons }}"
