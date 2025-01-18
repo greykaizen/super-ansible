@@ -1,0 +1,13 @@
+---
+- name: Install AUR packages
+  hosts: localhost
+  connection: local
+  become: false
+  vars_files:
+    - aur_pkg.yml
+  tasks:
+    - name: Install AUR packages
+      ansible.builtin.shell: paru -S --noconfirm {{ item }}
+      loop: "{{ aur_packages }}"
+      environment:
+        PATH: "{{ ansible_env.PATH }}"

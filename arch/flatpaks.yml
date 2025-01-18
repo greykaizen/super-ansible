@@ -1,0 +1,7 @@
+flatpak_packages:
+  - com.brave.Browser
+  - app.zen_browser.zen
+  - io.github.dvlv.boxbuddyrs
+  - org.jousse.vincent.Pomodorolm
+  - org.telegram.desktop
+  - com.github.tchx84.Flatseal

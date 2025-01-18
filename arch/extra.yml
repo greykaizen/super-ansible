@@ -1,0 +1,58 @@
+- name: Configure GRUB, Plymouth and Wallpaper
+  hosts: localhost
+  gather_facts: yes
+  become: yes  # Most tasks need root privileges
+
+  tasks:
+    - name: Set up GRUB configuration
+      when: ansible_facts['os_family'] == "Archlinux" or ansible_distribution == "CachyOS"
+      block:
+        - name: Install os-prober
+          pacman:
+            name: os-prober
+            state: present
+
+        - name: Run os-prober
+          command: os-prober
+          changed_when: false  # This prevents the task from always showing as changed
+
+        # - name: Ensure GRUB_DISABLE_OS_PROBER is set to false
+        #   lineinfile:
+        #     path: /etc/default/grub
+        #     regexp: '^GRUB_DISABLE_OS_PROBER='
+        #     line: 'GRUB_DISABLE_OS_PROBER=false'
+        #     create: yes  # Creates the line if it doesn't exist
+
+        - name: Ensure GRUB_DISABLE_OS_PROBER is set to false and not commented
+          lineinfile:
+            path: /etc/default/grub
+            regexp: '^#?GRUB_DISABLE_OS_PROBER='
+            line: 'GRUB_DISABLE_OS_PROBER=false'
+            create: yes
+
+        - name: Update GRUB configuration
+          command: grub-mkconfig -o /boot/grub/grub.cfg
+
+    - name: Configure Plymouth theme
+      when: ansible_facts['os_family'] == "Archlinux" or ansible_distribution == "CachyOS"
+      block:
+        - name: Set Plymouth theme to spinner
+          command: plymouth-set-default-theme -R spinner
+          register: plymouth_result
+          changed_when: plymouth_result.rc == 0
+          failed_when: plymouth_result.rc != 0 and 'theme not found' not in plymouth_result.stderr
+
+    - name: Set up GRUB wallpaper
+      when: ansible_facts['os_family'] == "Archlinux" or ansible_distribution == "CachyOS"
+      block:
+        - name: Ensure wallpapers directory exists
+          file:
+            path: /usr/share/wallpapers/cachyos-wallpapers
+            state: directory
+            mode: '0755'
+
+        - name: Copy GRUB wallpaper
+          copy:
+            src: wallpaper/splash.png
+            dest: /usr/share/wallpapers/cachyos-wallpapers/splash.png
+            mode: '0644'

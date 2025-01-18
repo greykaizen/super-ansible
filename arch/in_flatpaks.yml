@@ -1,0 +1,26 @@
+---
+- name: Install specified Flatpak applications
+  hosts: localhost
+  become: yes
+  tasks:
+    - name: Ensure Flatpak is installed
+      pacman:
+        name: flatpak
+        state: present
+  vars_files:
+    - flatpaks.yml
+
+  tasks:
+    - name: Add Flathub repository
+      community.general.flatpak_remote:
+        name: flathub
+        state: present
+        flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
+        method: user
+
+    - name: Install Flatpak applications
+      flatpak:
+        name: "{{ item }}"
+        state: present
+        # method: user
+      loop: "{{ flatpak_packages }}"
