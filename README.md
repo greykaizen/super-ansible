@@ -6,7 +6,8 @@ To know the name of the distro ansible is using
 > ansible localhost -m setup -a 'filter=ansible_distribution'
 
 - structure
-  ''' ansible-local/
+```
+  ansible-local/
     ├── roles/
     │   ├── flatpak/
     │   │   ├── tasks/
@@ -33,7 +34,7 @@ To know the name of the distro ansible is using
         │   └── packages.yml
         └── vars/
             └── packages.yml
-'''
+```
 
 - workables command for local testing
 > ansible-playbook local.yml
