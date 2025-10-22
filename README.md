@@ -1,6 +1,7 @@
 # super-ansible
 Space for the ansible configs.
 
+Next workable version is on [ansible-linux](https://github.com/greykaizen/ansible-linux)
 
 To know the name of the distro ansible is using
 > ansible localhost -m setup -a 'filter=ansible_distribution'
