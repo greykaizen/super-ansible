@@ -65,6 +65,24 @@
         - fedora
         - Ubuntu, popos
         
+- structure refine
+.
+├── ansible.cfg
+├── arch
+│   ├── aur_pkg.yml
+│   ├── extra.yml
+│   ├── flatpaks.yml
+│   ├── fonts.yml
+│   ├── icons.yml
+│   ├── in_aur_pkg.yml
+│   ├── in_flatpaks.yml
+│   ├── in_font_icons.yml
+│   ├── in_pkg.yml
+│   ├── packages.yml
+│   └── wallpaper
+│       └── splash.png
+├── inventory
+
 - todo
     
 - progress

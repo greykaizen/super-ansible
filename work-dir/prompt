@@ -1,3 +1,0 @@
-let's write a ansible playbook, targetted for localhost, we will write this from scratch and you have to help me with each and everything
-
-We are going to do some pre-tasks and tasks for arch linux. It should update the repo, system and other improvemenets and suggestion you have for pretasks. In tasks it should install pacman and aur packages (leave the area for me to write them down). also add more tasks for improvements and suggestion you have for me. One more thing, all the task should be placed in condition when it's distribution arch linux then execute

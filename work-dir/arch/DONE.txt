@@ -1,0 +1,11 @@
+- aur_pkg.yml
+- flatpaks.yml
+- in_aur_pkg.yml
+- in_flatpaks.yml
+- in_pkg.yml
+- packages.yml
+- extra.yml
+- fonts.yml
+- icons.yml
+-----------------
+in_font_icons.yml

@@ -1,12 +1,23 @@
 ---
-- name: Install specified Flatpak applications
+- name: Install Flatpak applications
   hosts: localhost
   become: yes
   tasks:
-    - name: Ensure Flatpak is installed
+    - name: Flatpak Install Check (Arch linux)
       pacman:
         name: flatpak
         state: present
+      when: ansible_distribution in ["Archlinux", "CachyOS"]
+    - name: Flatpak Install Check (Fedora)
+      dnf:
+        name: flatpak
+        state: present
+      when: ansible_distribution in ["Fedora", "CentOS", "RedHat"]
+    - name: Flatpak Install Check (Ubuntu)
+      apt:
+        name: flatpak
+        state: present
+      when: ansible_distribution in ["Debian", "Pop!_OS", "Ubuntu"]
   vars_files:
     - flatpaks.yml
 

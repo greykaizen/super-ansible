@@ -33,3 +33,5 @@ arch_packages:
   - rustup
   - zed
   - flatpak
+  - pip
+  -
